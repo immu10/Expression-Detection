@@ -10,6 +10,7 @@ from typing import Tuple, Union
 model_path = r"I:\codebs\MediapipeModel\blaze_face_short_range.tflite"
 # image_path = r"WIN_20251025_16_51_38_Pro.jpg"
 cap = cv2.VideoCapture(0)
+FaceDetectorResult = mp.tasks.vision.FaceDetectorResult
 
 def _normalized_to_pixel_coordinates(
     normalized_x: float, normalized_y: float, image_width: int,
@@ -58,8 +59,12 @@ def visualize(image,detection_result):
     return image
 
 # image = mp.Image.create_from_file(image_path)
+
+def print_result(result: FaceDetectorResult, output_image: mp.Image, timestamp_ms: int):
+    print('face detector result: {}'.format(result))
+
 base_options = python.BaseOptions(model_asset_path=model_path)
-options = vision.FaceDetectorOptions(base_options=base_options,running_mode=vision.RunningMode.LIVE_STREAM, result_callback=visu)
+options = vision.FaceDetectorOptions(base_options=base_options,running_mode=vision.RunningMode.LIVE_STREAM, result_callback=callback)
 detector = vision.FaceDetector.create_from_options(options)
 # frame_rate = cap.get(cv2.CAP_PROP_FPS)
 frame_rate = 30
