@@ -9,6 +9,8 @@ from typing import Tuple, Union
 
 model_path = r"I:\codebs\MediapipeModel\blaze_face_short_range.tflite"
 # image_path = r"WIN_20251025_16_51_38_Pro.jpg"
+image_path = r"Screenshot 2025-10-27 000158.png"
+img = cv2.imread(image_path)
 cap = cv2.VideoCapture(0)
 # FaceDetectorResult = mp.tasks.vision.FaceDetectorResult
 new_frame = None
@@ -37,7 +39,7 @@ def _normalized_to_pixel_coordinates(
 #     print("Detected faces:", result.detections)
 
 
-def visualize(image,detection_result):
+def visualize(image=img,detection_result=None):
     height, width, _ = image.shape
     # annotated_image = image.copy()
     # pprint.pprint(detection_result.detections)
@@ -67,14 +69,14 @@ def print_result(result, output_image: mp.Image, timestamp_ms: int):
     # annotated_image = visualize(output_image, result)
     # # rgb_annotated_image = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
     # cv2.imshow("name",frame.numpy_view())
-    if output_image is not None:
-        print("checkpoint 3")
-        print("output_image:",type(output_image))
-        cv2.imshow("name", output_image.numpy_view().copy())
-        cv2.waitKey(1)
+    print('face detector result: {}'.format(result))
+    global new_frame
+
+    new_frame = visualize(detection_result=result)
+    # cv2.imshow("name", visualized_image)
     # if cv2.waitKey(1) & 0xFF == ord('q'):
     #         exit(0)
-    print('face detector result: {}'.format(result))
+    
 
 base_options = python.BaseOptions(model_asset_path=model_path)
 options = vision.FaceDetectorOptions(base_options=base_options,running_mode=vision.RunningMode.LIVE_STREAM, result_callback=print_result)
@@ -86,7 +88,7 @@ cv2.namedWindow("name", cv2.WINDOW_NORMAL)
 cv2.namedWindow("input", cv2.WINDOW_NORMAL)
 
 while True:
-    # global frame
+    global frame
     ret, frame = cap.read()
    
     
@@ -106,8 +108,9 @@ while True:
         # # annotated_image = visualize(frame, detection_result)
         # # rgb_annotated_image = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
         # # cv2.imshow("name",annotated_image)
-        # if new_frame is not None:
-        #     cv2.imshow("name", new_frame)
+        if new_frame is not None:
+            cv2.imshow("name", new_frame)
+            new_frame = None
         
         # # cv2.imshow("Frame", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
